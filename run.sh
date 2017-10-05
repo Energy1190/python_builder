@@ -5,6 +5,11 @@ import time
 import shutil
 import docker
 
+def permission():
+    os.system('chmod 777 /data/build.complate')
+    os.system('chmod 777 /data/build.status')
+    os.system('chmod 777 /data/build.log')
+    
 def get_env(env):
     x = open('/data/build.env', 'r')
     for i in x:
@@ -16,6 +21,7 @@ def complate():
     x = open('/data/build.complate', 'w')
     x.write('1')
     x.close()
+    permission()
 
 def status(num):
     x = open('/data/build.status', 'w')
@@ -35,6 +41,7 @@ def fail(fail_log):
     x.write(fail_log)
     x.close()
     status('1')
+    complate()
 
 def build_and_push(user, paswd, name, tag, version='1.23'):
     log = open('/build.log', 'w')
