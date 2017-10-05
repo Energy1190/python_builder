@@ -39,6 +39,7 @@ def clen_dir(dir='/data/'):
             os.remove(dir + i)
         elif os.path.isdir(dir + i):
             clen_dir(dir=dir + i + '/')
+            os.rmdir(dir + i)
         else:
             print('Somfing wrong in {}'.format(dir + i))
 
