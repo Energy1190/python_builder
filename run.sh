@@ -5,11 +5,13 @@ import time
 import shutil
 import docker
 
+
 def permission():
     os.system('chmod 777 /data/build.complate')
     os.system('chmod 777 /data/build.status')
     os.system('chmod 777 /data/build.log')
-    
+
+
 def get_env(env):
     x = open('/data/build.env', 'r')
     for i in x:
@@ -17,22 +19,29 @@ def get_env(env):
             return i.split(sep='=')[1].replace('\n', '')
     return False
 
+
 def complate():
     x = open('/data/build.complate', 'w')
     x.write('1')
     x.close()
     permission()
 
+
 def status(num):
     x = open('/data/build.status', 'w')
     x.write(num)
     x.close()
 
+
 def clen_dir(dir='/data/'):
     for i in os.listdir(dir):
-        if os.path.isfile(dir + i): os.remove(dir + i)
-        elif os.path.isdir(dir + i): clen_dir(dir=dir + i + '/')
-        else: print('Somfing wrong in {}'.format(dir + i))
+        if os.path.isfile(dir + i):
+            os.remove(dir + i)
+        elif os.path.isdir(dir + i):
+            clen_dir(dir=dir + i + '/')
+        else:
+            print('Somfing wrong in {}'.format(dir + i))
+
 
 def fail(fail_log):
     clen_dir()
@@ -43,6 +52,7 @@ def fail(fail_log):
     status('1')
     complate()
 
+
 def build_and_push(user, paswd, name, tag, version='1.23'):
     log = open('/build.log', 'w')
     IMAGE = user + '/' + name
@@ -51,6 +61,7 @@ def build_and_push(user, paswd, name, tag, version='1.23'):
     for i in dc.images.push(IMAGE, stream=True, tag=tag, auth_config={'username': user, 'password': paswd}):
         log.write(str(i))
     log.close()
+
 
 def main():
     if not os.path.exists('/data/build.wait'): return False
@@ -65,8 +76,8 @@ def main():
     if not PATH: return fail('It is impossible to get a variable - PATH.')
     if not TAG: return fail('It is impossible to get a variable - TAG.')
 
-    if not os.path.exists('/tmp/run/docker.sock'): fail('no required file - docker.sock')
-    if not os.path.exists('/data/Dockerfile'): fail('no required file - Dockerfile')
+    if not os.path.exists('/tmp/run/docker.sock'): return fail('no required file - docker.sock')
+    if not os.path.exists('/data/Dockerfile'): return fail('no required file - Dockerfile')
 
     build_and_push(USERNAME, PASSWORD, PATH, TAG)
     clen_dir()
@@ -75,8 +86,9 @@ def main():
     status('0')
     complate()
 
+
 if __name__ == '__main__':
     print('Python-bulder: Start work')
     while True:
         time.sleep(5)
-        main()
+        main(
