@@ -91,4 +91,4 @@ if __name__ == '__main__':
     print('Python-bulder: Start work')
     while True:
         time.sleep(5)
-        main(
+        main()
