@@ -4,7 +4,7 @@ import os
 import time
 import shutil
 import docker
-
+import traceback
 
 def permission():
     os.system('chmod 777 /data/build.complate')
@@ -58,17 +58,24 @@ def build_and_push(user, paswd, name, tag, version='1.23'):
     log = open('/build.log', 'w')
     IMAGE = user + '/' + name
     dc = docker.DockerClient(base_url='unix://tmp/run/docker.sock', version=version)
-    x = dc.images.build(path='/data', tag='{}:{}'.format(IMAGE, tag))
+    try:
+        x = dc.images.build(path='/data', tag='{}:{}'.format(IMAGE, tag))
+    except docker.errors.BuildError as e:
+        log.write(str(traceback.format_exc()))
+        return False
+    
     for i in dc.images.push(IMAGE, stream=True, tag=tag, auth_config={'username': user, 'password': paswd}):
         log.write(str(i))
     log.close()
+    return True
 
 
 def main():
     if not os.path.exists('/data/build.wait'): return False
     if not os.path.exists('/data/build.env'): return False
-    
+
     print('Start build image.')
+
     USERNAME = get_env('USERNAME')
     PASSWORD = get_env('PASSWORD')
     PATH = get_env('PATH')
@@ -82,11 +89,17 @@ def main():
     if not os.path.exists('/tmp/run/docker.sock'): return fail('no required file - docker.sock')
     if not os.path.exists('/data/Dockerfile'): return fail('no required file - Dockerfile')
 
-    build_and_push(USERNAME, PASSWORD, PATH, TAG)
+    print('')
+    print('Name: {}'.format(USERNAME + '/' + PATH))
+    print('Tag: {}'.format(TAG))
+
+    x = build_and_push(USERNAME, PASSWORD, PATH, TAG)
     clen_dir()
     shutil.move('/build.log', '/data/build.log')
 
-    status('0')
+    if not x: status('1')
+    else: status('0')
+    
     complate()
 
 
