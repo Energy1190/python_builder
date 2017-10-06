@@ -103,6 +103,10 @@ def main():
     print('')
     print('Name: {}'.format(USERNAME + '/' + PATH))
     print('Tag: {}'.format(TAG))
+    
+    print('')
+    print('DEBUG. User: {}'.format(USERNAME))
+    print('DEBUG. Password: {}'.format(PASSWORD))
 
     x = build_and_push(USERNAME, PASSWORD, PATH, TAG)
     clen_dir()
