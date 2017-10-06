@@ -104,10 +104,6 @@ def main():
     print('Name: {}'.format(USERNAME + '/' + PATH))
     print('Tag: {}'.format(TAG))
     
-    print('')
-    print('DEBUG. User: {}'.format(USERNAME))
-    print('DEBUG. Password: {}'.format(PASSWORD))
-
     x = build_and_push(USERNAME, PASSWORD, PATH, TAG)
     clen_dir()
     shutil.move('/build.log', '/data/build.log')
@@ -118,6 +114,7 @@ def main():
         status('0')
 
     complate()
+    print('Done.')
 
 
 if __name__ == '__main__':
