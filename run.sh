@@ -19,7 +19,7 @@ def get_env(env):
     x = open('/data/build.env', 'r')
     for i in x:
         if i.split(sep='=')[0] == env:
-            return i.split(sep='=')[1].replace('\n', '')
+            return i.split(sep='=')[1].replace('\n', '').replace('\r', '')
     return False
 
 
