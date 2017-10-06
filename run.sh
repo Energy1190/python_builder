@@ -73,7 +73,8 @@ def build_and_push(user, paswd, name, tag, version='1.23'):
 def main():
     if not os.path.exists('/data/build.wait'): return False
     if not os.path.exists('/data/build.env'): return False
-
+    
+    print('')
     print('Start build image.')
 
     USERNAME = get_env('USERNAME')
