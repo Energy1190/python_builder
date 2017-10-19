@@ -67,21 +67,21 @@ def log_generate(data, file_obj):
         if len(list(data)) == 1:
             if 'stream' in list(data):
                 print(data['stream'].strip())
-                file_obj.write(data['stream'].strip().replace('|***|', '\n') + '\n')
+                file_obj.write(data['stream'].strip() + '\n')
             if 'message' in list(data):
                 print('MESSAGE:', data['message'].strip())
-                file_obj.write('MESSAGE:' + data['message'].strip().replace('|***|', '\n') + '\n')
+                file_obj.write('MESSAGE:' + data['message'].strip() + '\n')
         elif len(list(data)) == 2:
             if 'message' in list(data):
                 print('MESSAGE:', data['message'].strip())
-                file_obj.write('MESSAGE:' + data['message'].strip().replace('|***|', '\n') + '\n')
+                file_obj.write('MESSAGE:' + data['message'].strip() + '\n')
             if 'code' in list(data):
                 print('CODE:', data['code'])
                 file_obj.write('CODE:' + str(data['code']) + '\n')
             if 'error' in list(data):
                 flag = 1
                 print('ERROR:', data['error'].strip())
-                file_obj.write('ERROR:' + data['error'].strip().replace('|***|', '\n') + '\n')
+                file_obj.write('ERROR:' + data['error'].strip() + '\n')
             if 'errorDetail' in list(data):
                 print('ERROR DETAIL:')
                 file_obj.write('ERROR DETAIL:' + '\n')
@@ -90,7 +90,7 @@ def log_generate(data, file_obj):
             print('UNKNOWN:', data)
             file_obj.write('UNKNOWN:' + str(data) + '\n')
     try:
-        x = data.replace('\r\n', '').replace('\\\n', '|***|').replace('\\n', '|***|')
+        x = data.replace('\r\n', '').replace('\\\n', '').replace('\\n', '').replace('\n', '')
         y = ast.literal_eval(str(ast.literal_eval(x), 'utf-8'))
         analaze(y, file_obj)
     except:
