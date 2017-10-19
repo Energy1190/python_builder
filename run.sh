@@ -57,18 +57,49 @@ def fail(fail_log):
     status('1')
     complate()
 
-def log_generate(data):
-    print('DEBUG')
-    print('TYPE', type(data))
-    print('LEN', len(data))
-    print(data)
-    
-    x = ast.literal_eval(data)
-    print('TYPE', type(x))
-    print('LEN', len(x))
-    print(x)
-    
+
+def log_generate(data, file_obj):
+    flag = 0
+    def analaze(data, file_obj):
+        nonlocal flag
+        print('DEBUG ANALYZE:', type(data), len(data))
+        print('DEBUG ANALYZE:', print(data))
+        assert type(data) == dict
+        if len(list(data)) == 1:
+            if 'stream' in list(data):
+                print(data['stream'].strip())
+                file_obj.write(data['stream'].strip())
+            if 'message' in list(data):
+                print('MESSAGE:', data['message'].strip())
+                file_obj.write('MESSAGE:', data['message'].strip())
+        elif len(list(data)) == 2:
+            if 'message' in list(data):
+                print('MESSAGE:', data['message'].strip())
+                file_obj.write('MESSAGE:', data['message'].strip())
+            if 'code' in list(data):
+                print('CODE:', data['code'])
+                file_obj.write('CODE:', data['code'])
+            if 'error' in list(data):
+                flag = 1
+                print('ERROR:', data['error'].strip())
+                file_obj.write('ERROR:', data['error'].strip())
+            if 'errorDetail' in list(data):
+                print('ERROR DETAIL:')
+                file_obj.write('ERROR DETAIL:')
+                analaze(data['errorDetail'], file_obj)
+        else:
+            print('UNKNOWN:', data)
+    try:
+        x = data.replace('\r\n', '').replace('\\n', '')
+        y = ast.literal_eval(str(ast.literal_eval(x), 'utf-8'))
+        analaze(y, file_obj)
+    except:
+        print(str(traceback.format_exc()))
+        file_obj.write(str(traceback.format_exc()))
+    return flag
+
 def build_and_push(user, paswd, name, tag, version='1.23'):
+    status = True
     def low_level_build(IMAGE, tag, version):
         x = APIClient(base_url='unix://tmp/run/docker.sock', version=version)
         response = [line for line in x.build(path='/data', rm=True, tag='{}:{}'.format(IMAGE, tag))]
@@ -80,17 +111,15 @@ def build_and_push(user, paswd, name, tag, version='1.23'):
     try:
         #        x = dc.images.build(path='/data', tag='{}:{}'.format(IMAGE, tag))
         x = list(map(str, low_level_build(IMAGE, tag, version)))
-        [log_generate(i) for i in x]
-        list(map(log.write, x))
+        if any([log_generate(i, log) for i in x]): status = False
     except docker.errors.BuildError as e:
         log.write(str(traceback.format_exc()))
-        return False
+        return status
 
     for i in dc.images.push(IMAGE, stream=True, tag=tag, auth_config={'username': user, 'password': paswd}):
-        log_generate(i)
-        log.write(str(i))
+        log_generate(i, log)
     log.close()
-    return True
+    return status
 
 
 def main():
