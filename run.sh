@@ -56,6 +56,11 @@ def fail(fail_log):
     status('1')
     complate()
 
+def log_generate(data):
+    print('DEBUG')
+    print('TYPE', type(data))
+    print('LEN', len(data))
+    print(data)
 
 def build_and_push(user, paswd, name, tag, version='1.23'):
     def low_level_build(IMAGE, tag, version):
@@ -69,12 +74,14 @@ def build_and_push(user, paswd, name, tag, version='1.23'):
     try:
         #        x = dc.images.build(path='/data', tag='{}:{}'.format(IMAGE, tag))
         x = list(map(str, low_level_build(IMAGE, tag, version)))
+        [log_generate(i) for i in x]
         list(map(log.write, x))
     except docker.errors.BuildError as e:
         log.write(str(traceback.format_exc()))
         return False
 
     for i in dc.images.push(IMAGE, stream=True, tag=tag, auth_config={'username': user, 'password': paswd}):
+        log_generate(i)
         log.write(str(i))
     log.close()
     return True
@@ -103,7 +110,7 @@ def main():
     print('')
     print('Name: {}'.format(USERNAME + '/' + PATH))
     print('Tag: {}'.format(TAG))
-    
+
     x = build_and_push(USERNAME, PASSWORD, PATH, TAG)
     clen_dir()
     shutil.move('/build.log', '/data/build.log')
