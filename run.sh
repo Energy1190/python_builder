@@ -93,6 +93,12 @@ def log_generate(data, file_obj):
         x = data.replace('\r\n', '').replace('\\\n', '').replace('\\n', '').replace('\n', '')
         y = ast.literal_eval(str(ast.literal_eval(x), 'utf-8'))
         analaze(y, file_obj)
+    except SyntaxError:
+        file_obj.write('SYNTAX ERROR IN LOG_GENERATE AS TYPE {} AND LEN {}:'.format(type(data), len(data)) + str(data) + '\n')
+        return flag
+    except TypeError:
+        file_obj.write('TYPE ERROR IN LOG_GENERATE AS TYPE {} AND LEN {}:'.format(type(data), len(data)) + str(data) + '\n')
+        return flag
     except:
         print(str(traceback.format_exc()))
         file_obj.write(str(data) + '\n')
@@ -118,7 +124,7 @@ def build_and_push(user, paswd, name, tag, version='1.23'):
         return status
 
     for i in dc.images.push(IMAGE, stream=True, tag=tag, auth_config={'username': user, 'password': paswd}):
-        log_generate(i, log)
+        log_generate(str(i), log)
     log.close()
     return status
 
