@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import ast
 import time
 import shutil
 import docker
@@ -61,7 +62,12 @@ def log_generate(data):
     print('TYPE', type(data))
     print('LEN', len(data))
     print(data)
-
+    
+    x = ast.literal_eval(data)
+    print('TYPE', type(x))
+    print('LEN', len(x))
+    print(x)
+    
 def build_and_push(user, paswd, name, tag, version='1.23'):
     def low_level_build(IMAGE, tag, version):
         x = APIClient(base_url='unix://tmp/run/docker.sock', version=version)
