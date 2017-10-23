@@ -9,6 +9,19 @@ import traceback
 from io import BytesIO
 from docker import APIClient
 
+def load_config():
+    def load_git_repo(user, passwd):
+        os.system('mkdir /repo')
+        os.system('git clone https://{}:{}@bitbucket.org/Energy1190/jenkins_scripts /repo'.format(user, passwd))
+        return True
+
+    try:
+        load_git_repo(os.environ['GIT_USER'], os.environ['GIT_PASS'])
+    except:
+        return False
+
+    os.system('jenkins-jobs --conf /repo/config/config.ini update /repo/config/config.yaml')
+    return True
 
 def permission():
     os.system('chmod 777 /data/build.complate')
@@ -168,6 +181,8 @@ def main():
 
 if __name__ == '__main__':
     print('Python-bulder: Start work')
+    time.sleep(300)
+    if load_config(): print('The configuration is uploaded to the jenkins-server.')
     while True:
         time.sleep(5)
         main()
